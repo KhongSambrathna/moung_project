@@ -1,0 +1,12 @@
+/* For tablets (min-width: 768px) */
+@media (min-width: 100px) {
+    .act_head {
+        font-size: 18px;
+    }
+  }
+/* For tablets (min-width: 768px) */
+@media (min-width: 768px) {
+    .act_head {
+        font-size: 30px;
+    }
+  }
