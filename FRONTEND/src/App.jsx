@@ -8,7 +8,7 @@ import News from './pages/news/News';
 import Footer from './navigation/Footer';
 import Home from './pages/home/Home';
 import NoPage from './pages/nopage/Nopage';
-import About from './pages/about/about';
+import About from './pages/about/About';
 import Players from './pages/football/Players';
 import PlayerRanking from './pages/football/PlayerRanking';
 import MatchHistory from './pages/football/MatchHistory';
