@@ -71,6 +71,10 @@ app.get('/api/content/:contentId', async (req, res) => {
     }
   });
 
-  //For use image in front that it get url from server folder
-  app.use(express.static('uploads'));
- 
+//For use image in front that it get url from server folder app.use(express.static('uploads'));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Serve static files from the "uploads" directory
+app.use('/activity', express.static(path.join(__dirname, 'uploads/activity')));
+app.use('/content', express.static(path.join(__dirname, 'uploads/content')));
+app.use('/logo', express.static(path.join(__dirname, 'uploads/logo')));
