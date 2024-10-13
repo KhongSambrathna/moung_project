@@ -19,7 +19,8 @@ dotenv.config();
 
 // Middleware
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'https://moung-project.vercel.app', // Update this to your Vercel URL
+  origin: process.env.FRONTEND_URL, // Update this to your Vercel URL
+  // origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Customize as needed
   credentials: true, // Include cookies if needed
 };
@@ -71,8 +72,8 @@ app.get('/api/content/:contentId', async (req, res) => {
   });
 
   //For use image in front that it get url from server folder
-  // app . use(express.static('uploads'));
+  app.use(express.static('uploads'));
 
 // Serve static files from 'uploads' directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
  
