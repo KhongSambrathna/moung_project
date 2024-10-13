@@ -19,7 +19,7 @@ dotenv.config();
 
 // Middleware
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'https://your-vercel-frontend.vercel.app', // Update this to your Vercel URL
+  origin: process.env.FRONTEND_URL || 'https://moung-project.vercel.app', // Update this to your Vercel URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Customize as needed
   credentials: true, // Include cookies if needed
 };
@@ -71,7 +71,7 @@ app.get('/api/content/:contentId', async (req, res) => {
   });
 
   //For use image in front that it get url from server folder
-  app.use(express.static('uploads'));
+  app . use(express.static('uploads'));
 
 
  
