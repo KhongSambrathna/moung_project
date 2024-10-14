@@ -19,8 +19,8 @@ dotenv.config();
 
 // Middleware
 const corsOptions = {
-  origin: `${process.env.FRONTEND_URL}`, // Update this to your Vercel URL
-  // origin: 'https://moung-project.vercel.app',
+  // origin: `${process.env.FRONTEND_URL}`, // Update this to your Vercel URL
+  origin: 'https://moung-project.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Customize as needed
   credentials: true, // Include cookies if needed
 };
