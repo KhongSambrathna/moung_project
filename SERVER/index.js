@@ -18,14 +18,23 @@ const upload = multer(); // Configure multer
 dotenv.config();
 
 // Middleware
+const allowedOrigins = ['http://localhost:5173', 'https://moung-project.vercel.app'];
+
 const corsOptions = {
-  // origin: `${process.env.FRONTEND_URL}`, // Update this to your Vercel URL
-  origin: 'https://moung-project.vercel.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Customize as needed
-  credentials: true, // Include cookies if needed
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Allow requests with no origin (like Postman)
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
+
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 

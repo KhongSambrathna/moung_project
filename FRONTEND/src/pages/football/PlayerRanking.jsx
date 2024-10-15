@@ -4,12 +4,12 @@ import axios from "axios";
 function PlayerRanking() {
   // State for player goals
   const [playerGoals, setPlayerGoals] = useState([]);
-  const [playerAssists, setPlayerAssists] = useState([]);
   const [pageGoals, setPageGoals] = useState(1);
   const [totalPagesGoals, setTotalPagesGoals] = useState(0);
   const [searchTermGoals, setSearchTermGoals] = useState("");
 
   // State for player assists
+  const [playerAssists, setPlayerAssists] = useState([]);
   const [pageAssists, setPageAssists] = useState(1);
   const [totalPagesAssists, setTotalPagesAssists] = useState(0);
   const [searchTermAssists, setSearchTermAssists] = useState("");
@@ -40,7 +40,8 @@ function PlayerRanking() {
           params: { page: pageAssists, limit: 8, search: searchTermAssists },
         }
       );
-      setPlayerAssists(response.data.players);
+      const sortedPlayers = response.data.players.sort((a, b) => b.assists - a.assists);
+      setPlayerAssists(sortedPlayers);
       setTotalPagesAssists(response.data.totalPages);
     } catch (error) {
       console.log("Error While Fetching Data Sorted By Assists", error);
@@ -73,23 +74,6 @@ function PlayerRanking() {
     setPageAssists(newPage);
   };
 
-  // Fetch All players
-  const [AllPlayers, setAllPlayers] = useState([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/player/getAllPlayers`
-        );
-        setAllPlayers(response.data);
-      } catch (error) {
-        console.log("Error while fetching data with position GK", error);
-      }
-    };
-    fetchData();
-  }, []);
-  
-  
   return (
     <div className="container battambang text-nowrap">
       {/* Player Goals Section */}
@@ -127,34 +111,23 @@ function PlayerRanking() {
             </tr>
           </thead>
           <tbody>
-            {playerGoals.map((player) => {
-
-              let PlayerR = 0;
-              for(let j=0; j<playerGoals.length; j++){
-                if(player._id === AllPlayers[j]._id){
-                  PlayerR = j+1;
-                  break;
-                }
-              }
-              return (
-                <tr style={{ textAlign: "center" }} key={player.id}>
-                  <td scope="row">{PlayerR}</td> {/* Display ranking */}
-                  <td style={{ textAlign: "left" }}>{player.name}</td>
-                  <td>{player.position}</td>
-                  <td>{player.Village}</td>
-                  <td>{player.appearances}</td>
-                  <td>{player.goals}</td>
-                </tr>
-              );
-            })}
+            {playerGoals.map((player, index) => (
+              <tr style={{ textAlign: "center" }} key={player._id}>
+                <td scope="row">{(pageGoals - 1) * 8 + index + 1}</td> {/* Display ranking */}
+                <td style={{ textAlign: "left" }}>{player.name}</td>
+                <td>{player.position}</td>
+                <td>{player.Village}</td>
+                <td>{player.appearances}</td>
+                <td>{player.goals}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
         <div className="card-footer clearfix">
           <ul className="pagination pagination-sm m-0 float-right">
             <li
-              className="page-item"
+              className={`page-item ${pageGoals === 1 ? "disabled" : ""}`}
               onClick={() => handlePageChangeGoals(pageGoals - 1)}
-              disabled={pageGoals === 1}
             >
               <a className="page-link">«</a>
             </li>
@@ -168,9 +141,8 @@ function PlayerRanking() {
               </li>
             ))}
             <li
-              className="page-item"
+              className={`page-item ${pageGoals === totalPagesGoals ? "disabled" : ""}`}
               onClick={() => handlePageChangeGoals(pageGoals + 1)}
-              disabled={pageGoals === totalPagesGoals}
             >
               <a className="page-link">»</a>
             </li>
@@ -218,8 +190,8 @@ function PlayerRanking() {
             </thead>
             <tbody>
               {playerAssists.map((player, index) => (
-                <tr style={{ textAlign: "center" }} key={player.id}>
-                  <td scope="row">{(pageAssists - 1) * 8 + index + 1}</td>
+                <tr style={{ textAlign: "center" }} key={player._id}>
+                  <td scope="row">{(pageAssists - 1) * 8 + index + 1}</td> {/* Display ranking */}
                   <td style={{ textAlign: "left" }}>{player.name}</td>
                   <td>{player.position}</td>
                   <td>{player.Village}</td>
@@ -232,9 +204,8 @@ function PlayerRanking() {
           <div className="card-footer clearfix">
             <ul className="pagination pagination-sm m-0 float-right">
               <li
-                className="page-item"
+                className={`page-item ${pageAssists === 1 ? "disabled" : ""}`}
                 onClick={() => handlePageChangeAssists(pageAssists - 1)}
-                disabled={pageAssists === 1}
               >
                 <a className="page-link">«</a>
               </li>
@@ -248,9 +219,8 @@ function PlayerRanking() {
                 </li>
               ))}
               <li
-                className="page-item"
+                className={`page-item ${pageAssists === totalPagesAssists ? "disabled" : ""}`}
                 onClick={() => handlePageChangeAssists(pageAssists + 1)}
-                disabled={pageAssists === totalPagesAssists}
               >
                 <a className="page-link">»</a>
               </li>
