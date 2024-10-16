@@ -79,7 +79,7 @@ function ContentEditor() {
                     <div className="candidates-img float-left mr-4">
                       {/* Ensure to use forward slashes and correct file extension */}
                       <img
-                        src={`${import.meta.env.VITE_API_URL}/content/${(content.cover_url).split('uploads\\content\\').pop()}`} // Always use forward slashes
+                        src={`${content.cover_url}`} // Always use forward slashes
                         className="img-fluid d-block rounded"
                         alt={content.title}
                       />

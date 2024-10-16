@@ -15,6 +15,7 @@ function ContentUpdate() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // State to manage submission status
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -59,11 +60,19 @@ function ContentUpdate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Prevent multiple submissions
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true); // Set submission lock
+
     const formDataToSend = new FormData();
     formDataToSend.append('title', formData.title);
     formDataToSend.append('summary', formData.summary);
     formDataToSend.append('content', content);
-    
+
     // Only append files if they are selected
     if (formData.coverImage) {
       formDataToSend.append('coverImage', formData.coverImage);
@@ -82,6 +91,8 @@ function ContentUpdate() {
     } catch (error) {
       console.error('Error updating content:', error);
       alert('Failed to update content.');
+    } finally {
+      setIsSubmitting(false); // Release submission lock after the request completes
     }
   };
 
@@ -91,7 +102,9 @@ function ContentUpdate() {
         <div className="col-lg-9">
           <div className="card shadow-lg">
             <div className="float-left m-2">
-              <Link to="/admin/editor/" className="btn btn-outline btn-sm text-light border-light bg-warning">ត្រឡប់ក្រោយ</Link>
+              <Link to="/admin/editor/" className="btn btn-outline btn-sm text-light border-light bg-warning">
+                ត្រឡប់ក្រោយ
+              </Link>
             </div>
             <div className="card-header bg-primary text-white text-center">
               <h2 className="mb-0 py-4">កែប្រែ</h2>
@@ -105,7 +118,7 @@ function ContentUpdate() {
                 <form onSubmit={handleSubmit}>
                   <div className="mb-4">
                     <label htmlFor="title" className="form-label">ចំណងជើង :</label>
-                    <input 
+                    <input
                       type="text"
                       id="title"
                       name="title"
@@ -119,7 +132,7 @@ function ContentUpdate() {
                   </div>
                   <div className="mb-4">
                     <label htmlFor="summary" className="form-label">សង្ខេប :</label>
-                    <input 
+                    <input
                       type="text"
                       id="summary"
                       name="summary"
@@ -133,7 +146,7 @@ function ContentUpdate() {
                   </div>
                   <div className="mb-4">
                     <label htmlFor="coverImage" className="form-label">រូបក្រប 400x200 :</label>
-                    <input 
+                    <input
                       type="file"
                       id="coverImage"
                       name="coverImage"
@@ -144,7 +157,7 @@ function ContentUpdate() {
                   </div>
                   <div className="mb-4">
                     <label htmlFor="headerImage" className="form-label">រូបខាងលើមាតិកា 800x530 :</label>
-                    <input 
+                    <input
                       type="file"
                       id="headerImage"
                       name="headerImage"

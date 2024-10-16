@@ -1,17 +1,34 @@
-import multer  from 'multer';
-// Set up storage for uploaded files
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/content')
-  },
-  filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, uniqueSuffix  + '-' + file.originalname);
-  }
-})
+import multer from 'multer';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import cloudinary from 'cloudinary';
+import dotenv from 'dotenv';
 
-// Create the multer instance
+// Load environment variables
+dotenv.config();
+
+// Cloudinary configuration
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Set up Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary.v2,
+  params: {
+    folder: 'content', // Cloudinary folder where the images will be stored
+    format: async (req, file) => {
+      return file.originalname.split('.').pop(); // Keeps the file extension from the original
+    },
+    public_id: (req, file) => {
+      const originalNameWithoutExtension = file.originalname.split('.')[0];
+      return `${Date.now()}-${originalNameWithoutExtension}`; // Ensures the file has a unique name
+    },
+  },
+});
+
+// Create the multer instance with Cloudinary storage
 const upload = multer({ storage });
 
-// Export the upload middleware
 export default upload;

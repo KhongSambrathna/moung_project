@@ -45,7 +45,7 @@ function LatestPost() {
               <div className="lpa-right">
                 <a href={`/news/news_detail/${post._id}`}>
                   <img
-                    src={`${import.meta.env.VITE_API_URL}/content/${(post.cover_url).split('uploads\\content\\').pop()}`}
+                    src={`${post.cover_url}`}
                     alt={post.title}
                     title={post.title}
                   />

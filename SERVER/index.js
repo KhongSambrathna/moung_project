@@ -58,11 +58,9 @@ app.use("/api", contentRoute);
 
 // Content Route Example with Multer (Adjust as necessary)
 app.post('/api/create-content', upload.fields([{ name: 'coverImage' }, { name: 'headerImage' }]), (req, res) => {
-    console.log(req.body); // Non-file fields
-    console.log(req.files); // Uploaded files
-
-    // Your logic for saving to the database can go here.
-    res.status(200).json({ message: 'Content created successfully!' });
+  console.log(req.body); // Non-file fields
+  console.log(req.files); // Cloudinary file info
+  res.status(200).json({ message: 'Content created successfully!' });
 });
 
 //Express route to get content by ID

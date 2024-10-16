@@ -1,0 +1,49 @@
+.player-card {
+    border: none; /* Remove border */
+    border-radius: 8px; /* Rounded corners */
+    overflow: hidden; /* To contain the child elements */
+    transition: transform 0.3s; /* Animation on hover */
+    position: relative; /* To position elements within */
+  }
+  
+  .player-card:hover {
+    transform: scale(1.05); /* Scale effect on hover */
+  }
+  
+  .player-image {
+    background-size: cover; /* Cover the whole area */
+    background-position: center; /* Center the image */
+    height: 300px; /* Set a fixed height for the card */
+    display: flex; /* Use flexbox for centering */
+    justify-content: flex-start; /* Align items to the start (left) */
+    align-items: center; /* Center vertically */
+    color: #fff; /* White text color */
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7); /* Add shadow for better readability */
+    position: relative; /* For positioning the details */
+  }
+  
+  .player-details {
+    position: absolute; /* Absolute positioning */
+    left: 20px; /* Space from the left */
+    bottom: 20px; /* Space from the bottom */
+    padding: 10px; /* Padding around the text */
+    border-radius: 5px; /* Rounded corners */
+  }
+  
+  .player-number {
+    font-size: 40px; /* Large font size for number */
+    font-weight: bold; /* Bold number */
+    margin: 0; /* Remove margin */
+  }
+  
+  .player-name {
+    font-weight: bold; /* Bold name */
+    margin: 0; /* Remove margin */
+  }
+  
+  .player-role {
+    color: rgba(255, 255, 255, 0.8); /* Lighter color for role */
+    font-size: 0.9rem; /* Smaller font size */
+    margin: 0; /* Remove margin */
+  }
+  

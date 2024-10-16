@@ -5,7 +5,7 @@ import Wellcome2 from '../../assets/logo/banner/welcome-1.png';
 function Slider() {
   return (
         <div className="container" style={{'padding': '10px'}}>
-            <div id="carouselExampleSlidesOnly" className="pt-3 carousel slide" data-ride="carousel">
+            {/* <div id="carouselExampleSlidesOnly" className="pt-3 carousel slide" data-ride="carousel">
                 <div className="carousel-inner">
                 <div className="carousel-item active">
                     <img className="d-block w-100" src={Wellcome1} alt="img/logo/banner/welcome-1.png"/>
@@ -17,7 +17,7 @@ function Slider() {
                     <img className="d-block w-100" src={Wellcome1} alt="img/logo/banner/welcome-1.png"/>
                 </div>
                 </div>
-            </div>
+            </div> */}
         </div>
   )
 }

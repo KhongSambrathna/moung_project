@@ -1,6 +1,8 @@
 import Content from '../models/contentModel.js';
 import fs from 'fs';
 import path from 'path';
+import cloudinary from 'cloudinary';
+
 //Get Random Content
 export const getRandomContent = async (req, res) => {
     try {
@@ -128,24 +130,24 @@ export const getContentTitle = async (req, res) => {
 
 export const createContent = async (req, res) => {
   try {
-    // Extract the paths of uploaded images
-    const coverImage = req.files?.coverImage ? req.files.coverImage[0].path : null;
-    const headerImage = req.files?.headerImage ? req.files.headerImage[0].path : null;
+    // Extract the Cloudinary URLs of uploaded images
+    const coverImageUrl = req.files?.coverImage ? req.files.coverImage[0].path : null;
+    const headerImageUrl = req.files?.headerImage ? req.files.headerImage[0].path : null;
 
     // Validate that both images have been uploaded
-    if (!coverImage || !headerImage) {
+    if (!coverImageUrl || !headerImageUrl) {
       return res.status(400).json({ error: "Both images are required" });
     }
 
     const { title, summary, content } = req.body;
 
-    // Create a new content entry with the image paths
+    // Create a new content entry with Cloudinary image URLs
     const newContent = new Content({
       title,
       summary,
       content,
-      image_url: headerImage,  // Save header image path
-      cover_url: coverImage,   // Save cover image path
+      image_url: headerImageUrl,  // Save header image Cloudinary URL
+      cover_url: coverImageUrl,   // Save cover image Cloudinary URL
       date_published: new Date(),
     });
 
@@ -157,101 +159,84 @@ export const createContent = async (req, res) => {
   }
 };
 
-//Update Content
+// Update Content
 export const ContentUpdate = async (req, res) => {
-    console.log('Updating content with ID:', req.params.id);
-    console.log('Request body:', req.body);
-    console.log('Files:', req.files);
+  try {
+    const contentId = req.params.id;
 
-    try {
-        const contentId = req.params.id;
-
-        // Find the content by ID to get the old file paths
-        const oldContent = await Content.findById(contentId);
-        if (!oldContent) {
-            return res.status(404).json({ message: 'Content not found' });
-        }
-
-        // Prepare updates
-        const { title, summary, content } = req.body;
-        const updates = { title, summary, content };
-
-        // Delete old files if new files are provided
-        if (req.files) {
-            if (req.files.coverImage) {
-                // Delete the old cover image
-                fs.unlink(oldContent.cover_url, (err) => {
-                    if (err) {
-                        console.error(`Failed to delete old cover image: ${err}`);
-                    }
-                });
-                updates.cover_url = req.files.coverImage[0].path; 
-            }
-            if (req.files.headerImage) {
-                // Delete the old header image
-                fs.unlink(oldContent.image_url, (err) => {
-                    if (err) {
-                        console.error(`Failed to delete old header image: ${err}`);
-                    }
-                });
-                updates.image_url = req.files.headerImage[0].path; 
-            }
-        }
-
-        // Update the content in the database
-        const updatedContent = await Content.findByIdAndUpdate(contentId, updates, { new: true });
-        if (!updatedContent) {
-            return res.status(404).json({ message: 'Content not found' });
-        }
-
-        res.status(200).json({ message: 'Content updated successfully', data: updatedContent });
-    } catch (error) {
-        console.error('Error updating content:', error);
-        res.status(500).json({ message: 'Failed to update content' });
+    // Find the content by ID to get the old file paths
+    const oldContent = await Content.findById(contentId);
+    if (!oldContent) {
+      return res.status(404).json({ message: 'Content not found' });
     }
+
+    // Prepare updates
+    const { title, summary, content } = req.body;
+    const updates = { title, summary, content };
+
+    // Delete old files first, before uploading new ones
+    if (req.files) {
+      if (req.files.coverImage) {
+        // Delete the old cover image from Cloudinary
+        const coverPublicId = oldContent.cover_url.split('/').slice(-2).join('/').split('.')[0]; // Extract public ID
+        await cloudinary.v2.uploader.destroy(coverPublicId).then(re => console.log(`Deleted cover image: ${re.result}`));
+
+        // Upload new cover image after deleting the old one
+        const coverUploadResult = await cloudinary.v2.uploader.upload(req.files.coverImage[0].path, { folder: 'content' });
+        updates.cover_url = coverUploadResult.secure_url;
+      }
+
+      if (req.files.headerImage) {
+        // Delete the old header image from Cloudinary
+        const headerPublicId = oldContent.image_url.split('/').slice(-2).join('/').split('.')[0]; // Extract public ID
+        await cloudinary.v2.uploader.destroy(headerPublicId).then(re => console.log(`Deleted header image: ${re.result}`));
+
+        // Upload new header image after deleting the old one
+        const headerUploadResult = await cloudinary.v2.uploader.upload(req.files.headerImage[0].path, { folder: 'content' });
+        updates.image_url = headerUploadResult.secure_url;
+      }
+    }
+
+    // Now, update the content in the database
+    const updatedContent = await Content.findByIdAndUpdate(contentId, updates, { new: true });
+    if (!updatedContent) {
+      return res.status(404).json({ message: 'Content not found' });
+    }
+
+    res.status(200).json({ message: 'Content updated successfully', data: updatedContent });
+  } catch (error) {
+    console.error('Error updating content:', error);
+    res.status(500).json({ message: 'Failed to update content' });
+  }
 };
 
 // Delete content and associated images
 export const deleteContent = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const contentExist = await Content.findOne({_id: id});
-        
-        if (!contentExist) {
-            return res.status(404).json({ message: "Content Not Found." });
-        }
+  try {
+    const id = req.params.id;
+    const contentExist = await Content.findOne({ _id: id });
 
-        // Get the cover image and header image paths from the content
-        const coverImagePath = contentExist.cover_url ? path.resolve(contentExist.cover_url) : null;
-        const headerImagePath = contentExist.image_url ? path.resolve(contentExist.image_url) : null;
-        // Delete the header image if it exists
-        if (headerImagePath && fs.existsSync(headerImagePath)) {
-            fs.unlink(headerImagePath, (err) => {
-                if (err) {
-                    console.error(`Failed to delete header image`);
-                } else {
-                    console.log(`Header image deleted`);
-                }
-            });
-}
-        // Delete the cover image if it exists
-        if (coverImagePath && fs.existsSync(coverImagePath)) {
-            fs.unlink(coverImagePath, (err) => {
-                if (err) {
-                    console.error(`Failed to delete cover image`);
-                } else {
-                    console.log(`Cover image deleted`);
-                }
-            });
-        }
-
-        
-
-        // Delete the content from the database
-        await Content.findByIdAndDelete(id);
-
-        res.status(200).json({ message: "Content deleted successfully, along with associated images." });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+    if (!contentExist) {
+      return res.status(404).json({ message: "Content Not Found." });
     }
+
+    // Extract public ID for cover image and header image from Cloudinary URLs
+    const coverPublicId = contentExist.cover_url.split('/').slice(-2).join('/').split('.')[0]; // Gets 'content/<public_id>'
+    const headerPublicId = contentExist.image_url.split('/').slice(-2).join('/').split('.')[0]; // Gets 'content/<public_id>'
+
+    // Delete cover image from Cloudinary
+    const coverDeleteResponse = await cloudinary.v2.uploader.destroy(coverPublicId).then(re=>console.log(re));
+
+    // Delete header image from Cloudinary
+    const headerDeleteResponse = await cloudinary.v2.uploader.destroy(headerPublicId).then(re=>console.log(re));
+
+    // Delete the content from the database
+    await Content.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "Content and associated images deleted successfully." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
 };
+

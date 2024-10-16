@@ -82,11 +82,7 @@ function News() {
                       </div>
                       <Link to={`/news/news_detail/${content._id}`}>
                         <img style={{"width":"100%"}}
-                          src={`${
-                            import.meta.env.VITE_API_URL
-                          }/content/${content.cover_url
-                            .split("uploads\\content\\")
-                            .pop()}`}
+                          src={`${content.cover_url}`}
                           alt={content.title}
                         />
                       </Link>

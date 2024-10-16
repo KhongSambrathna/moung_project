@@ -10,37 +10,36 @@ function ContentCreate() {
     title: '',
     summary: '',
     coverImage: null,
-    headerImage: null
+    headerImage: null,
   });
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false); // To prevent multiple submissions
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setFormData({
-      ...formData,
-      [name]: files[0]
-    });
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: files[0],
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Prevent multiple form submissions
     if (submitted) {
-      return;
+      return; // Prevent multiple submissions
     }
 
     setLoading(true);
-    setSubmitted(true);  // Mark as submitted
+    setSubmitted(true);
 
     const formDataToSend = new FormData();
     formDataToSend.append('title', formData.title);
@@ -54,33 +53,30 @@ function ContentCreate() {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/create-content`, formDataToSend, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
       alert('Content created successfully!');
-
-      // Clear form fields after successful submission
-      clearForm();
+      clearForm(); // Clear form fields after successful submission
 
     } catch (error) {
       console.error('Error uploading content:', error.response?.data || error);
       alert('Failed to create content.');
     } finally {
       setLoading(false);
-      setSubmitted(false);  // Reset the submission state for future
+      setSubmitted(false);
     }
   };
 
   const clearForm = () => {
-    // Reset the form and editor
     setFormData({
       title: '',
       summary: '',
       coverImage: null,
-      headerImage: null
+      headerImage: null,
     });
-    setContent('');  // Clear content in the editor
+    setContent(''); // Clear content in the editor
   };
 
   return (
@@ -88,9 +84,9 @@ function ContentCreate() {
       <div className="row justify-content-center">
         <div className="col-lg-9">
           <div className="card shadow-lg">
-          <div className="float-left m-2">
-            <Link to={"/admin/editor/"} className="btn btn-outline btn-sm text-light border-light bg-warning">ត្រឡប់ក្រោយ</Link>
-          </div>
+            <div className="float-left m-2">
+              <Link to={"/admin/editor/"} className="btn btn-outline btn-sm text-light border-light bg-warning">ត្រឡប់ក្រោយ</Link>
+            </div>
             <div className="card-header bg-primary text-white text-center">
               <h2 className="mb-0 py-4">បង្កើត</h2>
             </div>
@@ -157,7 +153,7 @@ function ContentCreate() {
                   />
                 </div>
                 <div className="text-right">
-                <button 
+                  <button 
                     type="button" 
                     className="btn btn-lg btn-danger rounded-pill px-5 ms-3 mr-3" 
                     onClick={clearForm}
@@ -171,7 +167,6 @@ function ContentCreate() {
                   >
                     {loading ? 'Creating...' : 'Create Post'}
                   </button>
-                  
                 </div>
               </form>
             </div>

@@ -45,7 +45,7 @@ function NewDetails() {
             {conDetail && (
               <article className="article">
                 <div className="article-img">
-                <img src={`${import.meta.env.VITE_API_URL}/content/${(conDetail.image_url).split('uploads\\content\\').pop()}` || "https://via.placeholder.com/800x350/87CEFA/000000"} />
+                <img src={`${conDetail.image_url}` || "https://via.placeholder.com/800x350/87CEFA/000000"} />
                 </div>
                 <div className="article-title koulen">
                   <h3>{conDetail.title}</h3>
