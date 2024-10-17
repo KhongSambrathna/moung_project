@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import axios from "axios";
 import { useParams } from 'react-router-dom'; 
 import moungLogo from '../../../src/assets/logo/moung.jpg';
+import './newDetails.css'
 
 function NewDetails() {
   const { contentId } = useParams(); // Make sure this matches the URL parameter
